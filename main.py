@@ -6,17 +6,17 @@ Created on Fri Oct 12 17:53:43 2018
 """
 
 import asyncio
-from aiohttp import web
-import re
+from   aiohttp import web
 
+
+async def getWX(request):
+    return "hello, this is handle view"
 
 
 def __name():
-    loop = asyncio.get_event_loop();
     app = web.Application(loop=loop)
     app.router.add_route('GET', '/wx',getWX)
-    loop.close()
-
+    web.run_app(app)
 
 if __name__ == '__main__':
     __name()
