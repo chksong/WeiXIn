@@ -10,13 +10,18 @@ from   aiohttp import web
 
 
 async def getWX(request):
-    return "hello, this is handle view"
+    echostr = 'success'
+    try:
+        echostr = request.query['echostr']   
+    except Exception as ea:
+    	pass
+    return web.Response(body=echostr.encode('utf-8'))
 
 
 def __name():
-    app = web.Application(loop=loop)
+    app = web.Application()
     app.router.add_route('GET', '/wx',getWX)
-    web.run_app(app)
+    web.run_app(app,port=4131)
 
 if __name__ == '__main__':
     __name()
