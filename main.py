@@ -9,6 +9,8 @@ import asyncio
 from   aiohttp import web
 import hashlib
 
+import receive
+import reply
 
 def get_update(token, timestamp, nonce):
     arguments = ''
@@ -32,17 +34,45 @@ def check_signature(request):
 
 
 async def getWX(request):
-    
     echostr   = request.query['echostr']
     if check_signature(request):
         return web.Response(body = echostr.encode('utf-8'))
 
-    
 
+async def postWX(request):
+    webData = await request.text()
+    print("%s"% (webData))
+    recMsg = receive.parse_xml(webData)
+    if isinstance(recMsg,receive.Msg) and recMsg.MsgType == "text":
+        #注意fromUser 与 toUser交互
+        toUser = recMsg.FromUserName
+        fromUser = recMsg.ToUserName
+        content = "test-song"
+        replyMsg = reply.TextMsg(toUser, fromUser, content)
+        sendmsg = replyMsg.ToStr()
+        return web.Response(body=sendmsg.encode('utf-8'))
+    elif isinstance(recMsg,receive.TextMsg):
+        pass
+    elif isinstance(recMsg, receive.EventMsg):
+        if recMsg.Event.lower() == 'subscribe':   
+            toUser = recMsg.FromUserName
+            fromUser = recMsg.ToUserName
+            content = "欢迎关注我的博客"
+            replyMsg = reply.TextMsg(toUser, fromUser, content)
+            sendmsg = replyMsg.ToStr()
+            return web.Response(body=sendmsg.encode('utf-8'))
+        elif recMsg.Event.lower() == 'unsubscribe':
+            pass
+    else :
+        pass
+        
+    
 
 def __name():
     app = web.Application()
-    app.router.add_route('GET', '/wx',getWX)
+    app.router.add_route('GET', '/wx',getWX )
+    app.router.add_route('POST','/wx',postWX)
+    
     web.run_app(app,port=4131)
 
 if __name__ == '__main__':
