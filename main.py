@@ -57,12 +57,12 @@ async def postWX(request):
         if recMsg.Event.lower() == 'subscribe':   
             toUser = recMsg.FromUserName
             fromUser = recMsg.ToUserName
-            content = "欢迎关注我的博客"
+            content = "欢迎关注我的公众号"
             replyMsg = reply.TextMsg(toUser, fromUser, content)
             sendmsg = replyMsg.ToStr()
             return web.Response(body=sendmsg.encode('utf-8'))
         elif recMsg.Event.lower() == 'unsubscribe':
-            pass
+            return web.Response(body=reply.Msg().ToStr().encode('utf-8'))
     else :
         pass
         
